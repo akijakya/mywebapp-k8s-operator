@@ -44,19 +44,8 @@ spec:
   tls:
   - hosts:
     - hellofromtheinternet.hu
-    - www.hellofromtheinternet.hu
     secretName: hellofromtheinternet.hu-tls
   rules:
-  - host: www.hellofromtheinternet.hu
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-             name: nginx-app
-             port:
-               number: 80
   - host: hellofromtheinternet.hu
     http:
       paths:
