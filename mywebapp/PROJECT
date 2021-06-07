@@ -1,0 +1,16 @@
+domain: hellofromtheinternet.hu
+layout:
+- go.kubebuilder.io/v3
+projectName: mywebapp
+repo: hellofromtheinternet.hu/mywebapp
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: hellofromtheinternet.hu
+  group: webapp
+  kind: MyWebapp
+  path: hellofromtheinternet.hu/mywebapp/api/v0
+  version: v0
+version: "3"

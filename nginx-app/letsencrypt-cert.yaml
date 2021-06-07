@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hellofromtheinternet.hu
+  namespace: default
+spec:
+  secretName: hellofromtheinternet.hu-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: hellofromtheinternet.hu
+  dnsNames:
+  - hellofromtheinternet.hu
+  - www.hellofromtheinternet.hu

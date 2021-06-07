@@ -1,0 +1,7 @@
+apiVersion: webapp.hellofromtheinternet.hu/v0
+kind: MyWebapp
+metadata:
+  name: mywebapp-sample
+spec:
+  # Add fields here
+  foo: bar
