@@ -1,16 +1,87 @@
 package controllers
 
 import (
+	cmacme "github.com/jetstack/cert-manager/pkg/apis/acme/v1"
+	certmanager "github.com/jetstack/cert-manager/pkg/apis/certmanager/v1"
+	cmmeta "github.com/jetstack/cert-manager/pkg/apis/meta/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
-	// "k8s.io/ingress-nginx/internal/nginx"
 
 	webappv0 "hellofromtheinternet.hu/mywebapp/api/v0"
 )
+
+const (
+	certName  = "letsencrypt-prod"
+	userEmail = "user@example.com"
+)
+
+func (r *MyWebappReconciler) desiredIssuer(webapp webappv0.MyWebapp) (certmanager.ClusterIssuer, error) {
+	ingressClass := "nginx"
+	issuer := certmanager.ClusterIssuer{
+		TypeMeta: metav1.TypeMeta{APIVersion: certmanager.SchemeGroupVersion.String(), Kind: "ClusterIssuer"},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      certName,
+			Namespace: webapp.Namespace,
+		},
+		Spec: certmanager.IssuerSpec{
+			IssuerConfig: certmanager.IssuerConfig{
+				ACME: &cmacme.ACMEIssuer{
+					Server: "https://acme-v02.api.letsencrypt.org/directory",
+					Email:  userEmail,
+					PrivateKey: cmmeta.SecretKeySelector{
+						LocalObjectReference: cmmeta.LocalObjectReference{
+							Name: certName,
+						},
+					},
+					Solvers: []cmacme.ACMEChallengeSolver{
+						{
+							HTTP01: &cmacme.ACMEChallengeSolverHTTP01{
+								Ingress: &cmacme.ACMEChallengeSolverHTTP01Ingress{
+									Class: &ingressClass,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if err := ctrl.SetControllerReference(&webapp, &issuer, r.Scheme); err != nil {
+		return issuer, err
+	}
+
+	return issuer, nil
+}
+
+func (r *MyWebappReconciler) desiredCertificate(webapp webappv0.MyWebapp) (certmanager.Certificate, error) {
+	cert := certmanager.Certificate{
+		TypeMeta: metav1.TypeMeta{APIVersion: certmanager.SchemeGroupVersion.String(), Kind: "Certificate"},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      webapp.Spec.Host,
+			Namespace: webapp.Namespace,
+		},
+		Spec: certmanager.CertificateSpec{
+			SecretName: webapp.Spec.Host + "-tls",
+			IssuerRef: cmmeta.ObjectReference{
+				Name: certName,
+				Kind: "ClusterIssuer",
+			},
+			CommonName: webapp.Spec.Host,
+			DNSNames:   []string{webapp.Spec.Host},
+		},
+	}
+
+	if err := ctrl.SetControllerReference(&webapp, &cert, r.Scheme); err != nil {
+		return cert, err
+	}
+
+	return cert, nil
+}
 
 func (r *MyWebappReconciler) desiredDeployment(webapp webappv0.MyWebapp) (appsv1.Deployment, error) {
 	depl := appsv1.Deployment{

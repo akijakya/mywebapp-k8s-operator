@@ -19,6 +19,10 @@ package controllers
 import (
 	"context"
 
+	certmanager "github.com/jetstack/cert-manager/pkg/apis/certmanager/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	networkv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -49,6 +53,16 @@ func (r *MyWebappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	issuer, err := r.desiredIssuer(webapp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	certificate, err := r.desiredCertificate(webapp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	deployment, err := r.desiredDeployment(webapp)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -65,6 +79,16 @@ func (r *MyWebappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	applyOpts := []client.PatchOption{client.ForceOwnership, client.FieldOwner("mywebapp-controller")}
+
+	err = r.Patch(ctx, &issuer, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.Patch(ctx, &certificate, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	err = r.Patch(ctx, &deployment, client.Apply, applyOpts...)
 	if err != nil {
@@ -89,5 +113,10 @@ func (r *MyWebappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 func (r *MyWebappReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&webappv0.MyWebapp{}).
+		Owns(&certmanager.ClusterIssuer{}).
+		Owns(&certmanager.Certificate{}).
+		Owns(&corev1.Service{}).
+		Owns(&appsv1.Deployment{}).
+		Owns(&networkv1.Ingress{}).
 		Complete(r)
 }

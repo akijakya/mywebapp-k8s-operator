@@ -24,6 +24,10 @@ import (
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	certmanager "github.com/jetstack/cert-manager/pkg/apis/certmanager/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	networkv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -45,6 +49,15 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(webappv0.AddToScheme(scheme))
+	utilruntime.Must(appsv1.AddToScheme(scheme))
+	utilruntime.Must(corev1.AddToScheme(scheme))
+	utilruntime.Must(networkv1.AddToScheme(scheme))
+	utilruntime.Must(certmanager.AddToScheme(scheme))
+
+	// appsv1.AddToScheme(scheme)
+	// corev1.AddToScheme(scheme)
+	// networkv1.AddToScheme(scheme)
+	// certmanager.AddToScheme(scheme)
 	//+kubebuilder:scaffold:scheme
 }
 
