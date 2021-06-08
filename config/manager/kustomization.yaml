@@ -13,3 +13,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: akijakya/mywebapp-k8s-operator
+  newTag: v0
