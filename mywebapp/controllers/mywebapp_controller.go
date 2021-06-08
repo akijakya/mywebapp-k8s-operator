@@ -37,20 +37,51 @@ type MyWebappReconciler struct {
 //+kubebuilder:rbac:groups=webapp.hellofromtheinternet.hu,resources=mywebapps/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=webapp.hellofromtheinternet.hu,resources=mywebapps/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the MyWebapp object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=list;watch;get;patch
+// +kubebuilder:rbac:groups=core,resources=services,verbs=list;watch;get;patch
+
 func (r *MyWebappReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx).WithValues("mywebapp", req.NamespacedName)
+	log.Info("reconciling mywebapp")
 
-	// your logic here
+	var webapp webappv0.MyWebapp
+	if err := r.Get(ctx, req.NamespacedName, &webapp); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
+	deployment, err := r.desiredDeployment(webapp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	service, err := r.desiredService(webapp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	ingress, err := r.desiredIngress(webapp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	applyOpts := []client.PatchOption{client.ForceOwnership, client.FieldOwner("mywebapp-controller")}
+
+	err = r.Patch(ctx, &deployment, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.Patch(ctx, &service, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.Patch(ctx, &ingress, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info("reconciled mywebapp")
 	return ctrl.Result{}, nil
 }
 

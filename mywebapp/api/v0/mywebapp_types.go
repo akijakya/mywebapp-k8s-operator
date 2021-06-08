@@ -28,8 +28,16 @@ type MyWebappSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of MyWebapp. Edit mywebapp_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +optional
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=0
+	Replicas *int32 `json:"replicas,omitempty"` // using a pointer so it can be set to 0 without being nil -> default value
+
+	Host string `json:"host,omitempty"`
+
+	// +optional
+	// +kubebuilder:default=nginx
+	Image string `json:"image,omitempty"`
 }
 
 // MyWebappStatus defines the observed state of MyWebapp
@@ -38,8 +46,10 @@ type MyWebappStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:JSONPath=".spec.host",name="URL",type="string"
+// +kubebuilder:printcolumn:JSONPath=".spec.replicas",name="Desired",type="integer"
 
 // MyWebapp is the Schema for the mywebapps API
 type MyWebapp struct {

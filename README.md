@@ -55,3 +55,32 @@ go mod init mywebapp
 kubebuilder init --domain hellofromtheinternet.hu --repo hellofromtheinternet.hu/mywebapp
 kubebuilder create api --group webapp --kind MyWebApp --version v0
 ```
+
+Make changes in `/mywebapp/api/v0/mywebapp_types.go`, providing the options needs to be set for the operator.
+
+`make manifests` will create the manifest to install this new CRD to your cluster, which you will find here: `mywebapp/config/crd/bases/webapp.hellofromtheinternet.hu_mywebapps.yaml`
+
+Install it with `kubectl create -f config/crd/bases`
+
+Now you can modify the sample yaml to create one resource: `config/samples/webapp_v0_mywebapp.yaml`
+
+You can apply that as well with `kubectl create -f config/samples/webapp_v0_mywebapp.yaml`. If you made a mistake there, like a wrong type of value as an option, the validation will work.
+
+After creating it successfully you can get it right away:
+
+```
+kubectl get mywebapps
+
+NAME              AGE
+mywebapp-sample   10s
+```
+
+To have more fields than NAME and AGE, specify more columns in `api/v0/mywebapp_types.go` with adding lines like this one:
+
+```
+// +kubebuilder:printcolumn:JSONPath=".spec.host",name="URL",type="string"
+```
+
+Now its time to write the reconsiliation of the manifests we want to apply: `controllers/mywebapp_controller.go` and `controllers/helpers.go`.
+
+To check that it would work properly: `make run`
