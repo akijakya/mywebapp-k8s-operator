@@ -11,4 +11,4 @@ spec:
   commonName: hellofromtheinternet.hu
   dnsNames:
   - hellofromtheinternet.hu
-  - www.hellofromtheinternet.hu
+  
