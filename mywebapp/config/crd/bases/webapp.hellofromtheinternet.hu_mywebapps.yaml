@@ -43,10 +43,15 @@ spec:
           spec:
             description: MyWebappSpec defines the desired state of MyWebapp
             properties:
+              email:
+                description: Email address used for ACME registration
+                type: string
               host:
+                description: Host name for the webapp
                 type: string
               image:
                 default: nginx
+                description: Nginx image version
                 type: string
               replicas:
                 default: 1

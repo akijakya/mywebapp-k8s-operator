@@ -6,4 +6,5 @@ spec:
   # Add fields here
   replicas: 4
   host: hellofromtheinternet.hu
+  email: jakyandras@gmail.com
   image: nginx:1.20.1

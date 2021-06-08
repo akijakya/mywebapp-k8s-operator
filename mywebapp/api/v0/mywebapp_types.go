@@ -33,8 +33,13 @@ type MyWebappSpec struct {
 	// +kubebuilder:validation:Minimum=0
 	Replicas *int32 `json:"replicas,omitempty"` // using a pointer so it can be set to 0 without being nil -> default value
 
+	// Host name for the webapp
 	Host string `json:"host,omitempty"`
 
+	// Email address used for ACME registration
+	Email string `json:"email,omitempty"`
+
+	// Nginx image version
 	// +optional
 	// +kubebuilder:default=nginx
 	Image string `json:"image,omitempty"`

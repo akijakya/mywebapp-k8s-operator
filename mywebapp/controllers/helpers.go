@@ -15,8 +15,7 @@ import (
 )
 
 const (
-	certName  = "letsencrypt-prod"
-	userEmail = "user@example.com"
+	certName = "letsencrypt-prod"
 )
 
 func (r *MyWebappReconciler) desiredIssuer(webapp webappv0.MyWebapp) (certmanager.ClusterIssuer, error) {
@@ -31,7 +30,7 @@ func (r *MyWebappReconciler) desiredIssuer(webapp webappv0.MyWebapp) (certmanage
 			IssuerConfig: certmanager.IssuerConfig{
 				ACME: &cmacme.ACMEIssuer{
 					Server: "https://acme-v02.api.letsencrypt.org/directory",
-					Email:  userEmail,
+					Email:  webapp.Spec.Email,
 					PrivateKey: cmmeta.SecretKeySelector{
 						LocalObjectReference: cmmeta.LocalObjectReference{
 							Name: certName,

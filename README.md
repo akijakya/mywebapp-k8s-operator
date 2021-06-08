@@ -40,6 +40,7 @@ Lastly, we need to create an nginx-app deployment and service with ingress.
 ## Building an operator with Kubebuilder
 
 Following [this](https://www.youtube.com/watch?v=KBTXBUVNF2I) tutorial.
+Kubebuilder docs: https://book.kubebuilder.io/quick-start.html#installation
 
 ### Download kubebuilder and install locally.
 
@@ -84,3 +85,10 @@ To have more fields than NAME and AGE, specify more columns in `api/v0/mywebapp_
 Now its time to write the reconsiliation of the manifests we want to apply: `controllers/mywebapp_controller.go` and `controllers/helpers.go`.
 
 To check that it would work properly: `make run`
+
+To create an image, push that to a repository (if you use dockerhub, login first with `docker login`) and deploy:
+
+```
+export IMG=akijakya/mywebapp-k8s-operator:v0
+make docker-build docker-push deploy 
+```
