@@ -53,8 +53,10 @@ type MyWebappStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:JSONPath=".spec.host",name="URL",type="string"
-// +kubebuilder:printcolumn:JSONPath=".spec.replicas",name="Desired",type="integer"
+// +kubebuilder:printcolumn:JSONPath=".spec.host",name="Host",type="string"
+// +kubebuilder:printcolumn:JSONPath=".spec.email",name="Email",type="string"
+// +kubebuilder:printcolumn:JSONPath=".spec.replicas",name="Replicas",type="integer"
+// +kubebuilder:printcolumn:JSONPath=".spec.image",name="Image",type="string"
 
 // MyWebapp is the Schema for the mywebapps API
 type MyWebapp struct {

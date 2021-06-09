@@ -53,11 +53,6 @@ func init() {
 	utilruntime.Must(corev1.AddToScheme(scheme))
 	utilruntime.Must(networkv1.AddToScheme(scheme))
 	utilruntime.Must(certmanager.AddToScheme(scheme))
-
-	// appsv1.AddToScheme(scheme)
-	// corev1.AddToScheme(scheme)
-	// networkv1.AddToScheme(scheme)
-	// certmanager.AddToScheme(scheme)
 	//+kubebuilder:scaffold:scheme
 }
 

@@ -18,11 +18,17 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .spec.host
-      name: URL
+      name: Host
+      type: string
+    - jsonPath: .spec.email
+      name: Email
       type: string
     - jsonPath: .spec.replicas
-      name: Desired
+      name: Replicas
       type: integer
+    - jsonPath: .spec.image
+      name: Image
+      type: string
     name: v0
     schema:
       openAPIV3Schema:

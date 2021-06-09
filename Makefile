@@ -1,6 +1,7 @@
-
-# Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+# Image URL and TAG to use all building/pushing image targets
+TAG ?= v0 # $(shell git describe --tags --abbrev=0 --match '[0-9].*[0-9].*[0-9]' 2>/dev/null )
+IMAGE_REPOSITORY ?= akijakya/mywebapp-k8s-operator
+IMG ?= ${IMAGE_REPOSITORY}:$(TAG)
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
@@ -76,6 +77,14 @@ install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~
 
 uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+
+install-pre: ## Install prerequisites
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml
+	kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml
+
+uninstall-pre: ## Uninstall prerequisites
+	kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml
+	kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml
 
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
