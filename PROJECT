@@ -1,7 +1,7 @@
 domain: hellofromtheinternet.hu
 layout:
 - go.kubebuilder.io/v3
-projectName: mywebapp
+projectName: mywebapp-k8s-operator
 repo: hellofromtheinternet.hu/mywebapp
 resources:
 - api:

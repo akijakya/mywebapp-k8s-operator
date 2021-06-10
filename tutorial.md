@@ -1,4 +1,4 @@
-# Tutorial for making a kubernetes-operator
+# Tutorial for making a kubernetes operator
 
 ## Setting up local dev environment with KIND
 
@@ -164,8 +164,8 @@ chmod +x kubebuilder && sudo mv kubebuilder /usr/local/bin/
 
 ```
 go mod init mywebapp
-kubebuilder init --domain hellofromtheinternet.hu --repo hellofromtheinternet.hu/mywebapp
-kubebuilder create api --group webapp --kind MyWebApp --version v0
+kubebuilder init --domain example.com --repo example.com/mywebapp
+kubebuilder create api --group webapp --kind MyWebapp --version v0
 ```
 
 Make changes in `/mywebapp/api/v0/mywebapp_types.go`, providing the options needs to be set for the operator.
@@ -201,5 +201,5 @@ To create an image, push that to a repository (if you use dockerhub, login first
 
 ```
 export IMG=akijakya/mywebapp-k8s-operator:v0
-make docker-build docker-push deploy 
+make docker-build docker-push deploy
 ```

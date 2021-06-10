@@ -24,4 +24,4 @@ testbin/*
 *~
 
 # Kind and kubeconfigs
-/kubeconfig
+/localconfig
